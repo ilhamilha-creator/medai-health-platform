@@ -40,13 +40,13 @@ from config.settings import settings
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    print("🚀 Starting Medical AI Platform Backend...")
+    print("Starting Medical AI Platform Backend...")
     await init_db()
-    print("✅ Database initialized")
-    print("✅ Backend ready")
+    print("Database initialized")
+    print("Backend ready")
     yield
     # Shutdown
-    print("🛑 Shutting down Medical AI Platform Backend...")
+    print("Shutting down Medical AI Platform Backend...")
 
 # Create FastAPI app
 app = FastAPI(
