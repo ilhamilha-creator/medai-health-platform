@@ -1,0 +1,115 @@
+{
+  "diabetes": {
+    "accuracy": 0.498,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0,
+    "auc": 0.515910254564073,
+    "confusion_matrix": [
+      [
+        498,
+        0
+      ],
+      [
+        502,
+        0
+      ]
+    ],
+    "test_samples": 1000
+  },
+  "cardiovascular": {
+    "accuracy": 0.498,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0,
+    "auc": 0.5,
+    "confusion_matrix": [
+      [
+        498,
+        0
+      ],
+      [
+        502,
+        0
+      ]
+    ],
+    "test_samples": 1000
+  },
+  "cancer": {
+    "error": "Feature shape mismatch, expected: 7, got 6"
+  },
+  "kidney": {
+    "accuracy": 0.518,
+    "precision": 0.518,
+    "recall": 1.0,
+    "f1_score": 0.6824769433465085,
+    "auc": 0.5,
+    "confusion_matrix": [
+      [
+        0,
+        482
+      ],
+      [
+        0,
+        518
+      ]
+    ],
+    "test_samples": 1000
+  },
+  "liver": {
+    "accuracy": 0.482,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0,
+    "auc": 0.5,
+    "confusion_matrix": [
+      [
+        482,
+        0
+      ],
+      [
+        518,
+        0
+      ]
+    ],
+    "test_samples": 1000
+  },
+  "thyroid": {
+    "accuracy": 0.518,
+    "precision": 0.518,
+    "recall": 1.0,
+    "f1_score": 0.6824769433465085,
+    "auc": 0.5,
+    "confusion_matrix": [
+      [
+        0,
+        482
+      ],
+      [
+        0,
+        518
+      ]
+    ],
+    "test_samples": 1000
+  },
+  "respiratory": {
+    "accuracy": 0.482,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1_score": 0.0,
+    "auc": 0.5,
+    "confusion_matrix": [
+      [
+        482,
+        0
+      ],
+      [
+        518,
+        0
+      ]
+    ],
+    "test_samples": 1000
+  },
+  "timestamp": "2026-10-29T17:08:16.754932",
+  "note": "Evaluation on synthetic test data. Real-world validation needed."
+}

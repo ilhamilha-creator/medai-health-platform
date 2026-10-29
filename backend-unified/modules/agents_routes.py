@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict
 from modules.auth.routes import get_current_user
-from modules.ai_agents import symptom_agent, urgency_agent, coordination_agent
+from modules.ai_agents import symptom_agent, urgency_agent, coordination_agent, care_plan_agent, follow_up_agent
 from modules.temporal_reasoning import temporal_reasoning
 
 agents_router = APIRouter()
@@ -34,6 +34,16 @@ class CareCoordinationRequest(BaseModel):
     patient_id: str
     needs: List[str]
     caregivers: Dict
+
+class CarePlanSynthesisRequest(BaseModel):
+    patient_data: Dict
+    clinical_findings: Dict
+    recommendations: List[str]
+
+class FollowUpScheduleRequest(BaseModel):
+    patient_id: str
+    tasks: List[Dict]
+    time_horizon_days: int = 30
 
 class TemporalChangesRequest(BaseModel):
     patient_id: str
@@ -69,6 +79,26 @@ async def coordinate_care(request: CareCoordinationRequest, current_user: dict =
     """Coordinate care using AI agent"""
     result = coordination_agent.coordinate(request.patient_id, request.needs, request.caregivers)
     return result
+
+# Care Plan Synthesis Agent Route
+@agents_router.post("/care-plan-synthesis")
+async def synthesize_care_plan(request: CarePlanSynthesisRequest, current_user: dict = Depends(get_current_user)):
+    """Synthesize comprehensive care plan using AI agent"""
+    result = care_plan_agent.synthesize(request.patient_data, request.clinical_findings, request.recommendations)
+    return result
+
+# Follow-up Scheduling Agent Route
+@agents_router.post("/follow-up-schedule")
+async def schedule_follow_up(request: FollowUpScheduleRequest, current_user: dict = Depends(get_current_user)):
+    """Schedule follow-up tasks using AI agent"""
+    result = follow_up_agent.schedule_follow_up(request.patient_id, request.tasks, request.time_horizon_days)
+    return result
+
+@agents_router.get("/follow-up-upcoming/{patient_id}")
+async def get_upcoming_follow_ups(patient_id: str, days_ahead: int = 7, current_user: dict = Depends(get_current_user)):
+    """Get upcoming follow-ups for a patient"""
+    result = follow_up_agent.get_upcoming_follow_ups(patient_id, days_ahead)
+    return {"patient_id": patient_id, "upcoming_follow_ups": result}
 
 # Temporal Reasoning Routes
 @agents_router.post("/temporal-changes", response_model=TemporalChangesResponse)
