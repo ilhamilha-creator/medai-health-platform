@@ -3,10 +3,15 @@ LangChain-based Care Plan Agent
 Uses LangChain for sophisticated care plan generation
 """
 
-from langchain.agents import AgentExecutor, create_openai_functions_agent
-from langchain.tools import Tool
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.schema import SystemMessage
+try:
+    from langchain.agents import AgentExecutor, create_openai_functions_agent
+    from langchain.tools import Tool
+    from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+    from langchain.schema import SystemMessage
+    LANGCHAIN_AVAILABLE = True
+except ImportError:
+    LANGCHAIN_AVAILABLE = False
+    print("LangChain agents not available, using custom implementation")
 
 print("Initializing LangChain Care Plan Agent...")
 
