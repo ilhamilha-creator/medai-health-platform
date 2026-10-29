@@ -182,8 +182,20 @@ medai-health-platform/
 │   ├── components/          # React components
 │   ├── contexts/            # React contexts
 │   └── services/            # API services
+├── public/                  # Static assets
 ├── docs/                    # Documentation
-└── README.md
+├── .env.example             # Environment variables template
+├── .gitignore               # Git ignore rules
+├── craco.config.js          # CRACO configuration
+├── docker-compose.yml        # Docker compose
+├── install.bat              # Windows installation script
+├── install.sh               # Linux/Mac installation script
+├── package.json             # npm dependencies
+├── package-lock.json         # npm lock file
+├── tailwind.config.js        # Tailwind CSS configuration
+├── vercel.json              # Vercel deployment config
+├── DEMO_GUIDE.md            # Demo guide
+└── README.md                # This file
 ```
 
 ## 📊 Evaluation Results
