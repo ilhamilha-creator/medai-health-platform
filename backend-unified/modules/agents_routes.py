@@ -8,6 +8,9 @@ from typing import List, Dict
 from modules.auth.routes import get_current_user
 from modules.ai_agents import symptom_agent, urgency_agent, coordination_agent, care_plan_agent, follow_up_agent
 from modules.temporal_reasoning import temporal_reasoning
+from modules.langchain_agents import langchain_care_agent
+from modules.advanced_temporal import advanced_temporal
+from modules.document_integration import doc_integration
 
 agents_router = APIRouter()
 
@@ -99,6 +102,45 @@ async def get_upcoming_follow_ups(patient_id: str, days_ahead: int = 7, current_
     """Get upcoming follow-ups for a patient"""
     result = follow_up_agent.get_upcoming_follow_ups(patient_id, days_ahead)
     return {"patient_id": patient_id, "upcoming_follow_ups": result}
+
+# LangChain Care Plan Agent Route
+@agents_router.post("/langchain-care-plan")
+async def langchain_care_plan(request: CarePlanSynthesisRequest, current_user: dict = Depends(get_current_user)):
+    """Generate care plan using LangChain tools"""
+    result = langchain_care_agent.generate_care_plan(request.patient_data, request.clinical_findings.get('conditions', []))
+    return result
+
+# Advanced Temporal Reasoning Routes
+@agents_router.post("/advanced-temporal-cusum/{patient_id}/{metric}")
+async def advanced_temporal_cusum(patient_id: str, metric: str, k: float = 0.5, h: float = 5, current_user: dict = Depends(get_current_user)):
+    """CUSUM change detection"""
+    changes = advanced_temporal.detect_changes_cusum(patient_id, metric, k, h)
+    return {"patient_id": patient_id, "metric": metric, "changes": changes}
+
+@agents_router.post("/advanced-temporal-ewma/{patient_id}/{metric}")
+async def advanced_temporal_ewma(patient_id: str, metric: str, alpha: float = 0.3, std_threshold: float = 2, current_user: dict = Depends(get_current_user)):
+    """EWMA change detection"""
+    changes = advanced_temporal.detect_changes_ewma(patient_id, metric, alpha, std_threshold)
+    return {"patient_id": patient_id, "metric": metric, "changes": changes}
+
+@agents_router.post("/advanced-temporal-anomalies/{patient_id}/{metric}")
+async def advanced_temporal_anomalies(patient_id: str, metric: str, threshold: float = 3, current_user: dict = Depends(get_current_user)):
+    """Z-score anomaly detection"""
+    anomalies = advanced_temporal.detect_anomalies_zscore(patient_id, metric, threshold)
+    return {"patient_id": patient_id, "metric": metric, "anomalies": anomalies}
+
+# Document Integration Route
+@agents_router.post("/document-process")
+async def process_document(doc_id: str, text: str, current_user: dict = Depends(get_current_user)):
+    """Process medical document and extract information"""
+    result = doc_integration.process_document(doc_id, text)
+    return {"doc_id": doc_id, "extracted_info": result}
+
+@agents_router.get("/document-summary/{doc_id}")
+async def get_document_summary(doc_id: str, current_user: dict = Depends(get_current_user)):
+    """Get document summary"""
+    result = doc_integration.get_summary(doc_id)
+    return {"doc_id": doc_id, "summary": result}
 
 # Temporal Reasoning Routes
 @agents_router.post("/temporal-changes", response_model=TemporalChangesResponse)
