@@ -64,3 +64,5 @@ backend-unified/venv/
 backend-unified/__pycache__/
 backend-unified/modules/__pycache__/
 backend-unified/modules/*/__pycache__/
+backend-unified/venv/
+backend-unified/venv/*
