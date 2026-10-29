@@ -31,6 +31,7 @@ from modules.vision_service.routes import vision_router
 from modules.appointments.routes import appointments_router
 from modules.middleware.logging import logging_middleware
 from modules.middleware.audit import audit_middleware
+from modules.agents_routes import agents_router
 
 # Configuration
 from config.settings import settings
@@ -121,6 +122,7 @@ app.include_router(ml_router, prefix="/api/ml", tags=["ML Predictions"])
 app.include_router(llm_router, prefix="/api/llm", tags=["Local LLM"])
 app.include_router(vision_router, prefix="/api/vision", tags=["Vision Service"])
 app.include_router(appointments_router, prefix="/api", tags=["Appointments"])
+app.include_router(agents_router, prefix="/api/agents", tags=["AI Agents"])
 
 # Health check
 @app.get("/health", 
