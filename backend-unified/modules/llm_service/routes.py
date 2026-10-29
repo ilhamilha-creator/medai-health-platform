@@ -18,7 +18,7 @@ llm_router = APIRouter()
 llm_model = None
 
 def get_llm_model():
-    """Lazy load LLM model"""
+    """Lazy load LLM model with fallback"""
     global llm_model
     if llm_model is None:
         try:
@@ -27,7 +27,15 @@ def get_llm_model():
             model_path = getattr(settings, 'LLM_MODEL_PATH', './models/phi-3-mini-4k-instruct-q4.gguf')
             
             if not os.path.exists(model_path):
-                raise FileNotFoundError(f"LLM model not found at {model_path}. Download from HuggingFace.")
+                print(f"LLM model not found at {model_path}. Using fallback.")
+                # Try to load fallback
+                try:
+                    from fallback_llm import FallbackLLM
+                    llm_model = FallbackLLM()
+                    print("Fallback LLM loaded")
+                    return llm_model
+                except:
+                    raise FileNotFoundError(f"LLM model not found and fallback unavailable")
             
             llm_model = Llama(
                 model_path=model_path,
@@ -39,9 +47,23 @@ def get_llm_model():
             print(f"LLM loaded from {model_path}")
             
         except ImportError:
-            raise RuntimeError("llama-cpp-python not installed. Install: pip install llama-cpp-python")
+            # Try fallback
+            try:
+                from fallback_llm import FallbackLLM
+                llm_model = FallbackLLM()
+                print("Fallback LLM loaded (llama-cpp-python not installed)")
+                return llm_model
+            except:
+                raise RuntimeError("llama-cpp-python not installed and fallback unavailable")
         except Exception as e:
-            raise RuntimeError(f"Failed to load LLM: {e}")
+            # Try fallback
+            try:
+                from fallback_llm import FallbackLLM
+                llm_model = FallbackLLM()
+                print(f"Fallback LLM loaded (original error: {e})")
+                return llm_model
+            except:
+                raise RuntimeError(f"Failed to load LLM: {e}")
     
     return llm_model
 
@@ -68,32 +90,44 @@ class HealthResponse(BaseModel):
 
 @llm_router.post("/chat", response_model=ChatResponse)
 async def chat_with_llm(request: ChatRequest, current_user: dict = Depends(get_current_user)):
-    """Chat with REAL local LLM for African healthcare context"""
+    """Chat with local LLM for African healthcare context (with fallback)"""
     if not settings.LLM_ENABLED:
         raise HTTPException(status_code=503, detail="LLM service is disabled. Enable LLM_ENABLED=True in .env")
     
     try:
         model = get_llm_model()
         
-        prompt = "You are a helpful medical assistant for African healthcare context. "
+        # Check if it's fallback LLM
+        is_fallback = hasattr(model, 'generate')
         
-        if request.conversation_history:
-            for msg in request.conversation_history:
-                if msg.get('role') == 'user':
-                    prompt += f"User: {msg.get('content', '')} "
-                elif msg.get('role') == 'assistant':
-                    prompt += f"Assistant: {msg.get('content', '')} "
-        
-        prompt += f"User: {request.message} Assistant:"
-        
-        start_time = time.time()
-        max_tokens = request.max_tokens or 512
-        
-        output = model(prompt, max_tokens=max_tokens)
-        response_text = output['choices'][0]['text'].strip()
-        
-        elapsed = time.time() - start_time
-        tokens_per_second = len(response_text.split()) / elapsed if elapsed > 0 else 0
+        if is_fallback:
+            # Use fallback
+            prompt = request.message
+            start_time = time.time()
+            response_text = model.generate(prompt, max_tokens=request.max_tokens or 512)
+            elapsed = time.time() - start_time
+            tokens_per_second = len(response_text.split()) / elapsed if elapsed > 0 else 0
+        else:
+            # Use real LLM
+            prompt = "You are a helpful medical assistant for African healthcare context. "
+            
+            if request.conversation_history:
+                for msg in request.conversation_history:
+                    if msg.get('role') == 'user':
+                        prompt += f"User: {msg.get('content', '')} "
+                    elif msg.get('role') == 'assistant':
+                        prompt += f"Assistant: {msg.get('content', '')} "
+            
+            prompt += f"User: {request.message} Assistant:"
+            
+            start_time = time.time()
+            max_tokens = request.max_tokens or 512
+            
+            output = model(prompt, max_tokens=max_tokens)
+            response_text = output['choices'][0]['text'].strip()
+            
+            elapsed = time.time() - start_time
+            tokens_per_second = len(response_text.split()) / elapsed if elapsed > 0 else 0
         
         # Detect symptoms from response (simple keyword matching)
         detected_symptoms = []
@@ -125,17 +159,21 @@ async def chat_with_llm(request: ChatRequest, current_user: dict = Depends(get_c
 
 @llm_router.post("/analyze-symptoms")
 async def analyze_symptoms_llm(symptoms: str, current_user: dict = Depends(get_current_user)):
-    """Analyze symptoms using REAL local LLM with African context"""
+    """Analyze symptoms using local LLM with African context (with fallback)"""
     if not settings.LLM_ENABLED:
         raise HTTPException(status_code=503, detail="LLM service is disabled")
     
     try:
         model = get_llm_model()
         
-        prompt = f"Analyze these symptoms in African healthcare context: {symptoms}. Provide possible conditions and recommendations."
+        is_fallback = hasattr(model, 'generate')
         
-        output = model(prompt, max_tokens=256)
-        analysis = output['choices'][0]['text'].strip()
+        if is_fallback:
+            analysis = model.generate(f"Analyze these symptoms: {symptoms}", max_tokens=256)
+        else:
+            prompt = f"Analyze these symptoms in African healthcare context: {symptoms}. Provide possible conditions and recommendations."
+            output = model(prompt, max_tokens=256)
+            analysis = output['choices'][0]['text'].strip()
         
         return {
             "analysis": analysis,
