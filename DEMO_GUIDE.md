@@ -85,9 +85,8 @@ curl -X POST http://localhost:8000/api/agents/urgency-assessment \
 ✅ **AI Agents** - Symptom analysis, urgency assessment, care coordination
 ✅ **Temporal Reasoning** - Track changes over time
 ✅ **RAG** - Medical knowledge base retrieval
-✅ **LLM** - Fallback LLM (simulated responses)
+✅ **LLM** - DistilGPT2 (HuggingFace transformers, auto-downloads 500MB)
 ⚠️ **Vision** - Code exists but not tested
-⚠️ **phi-3-mini** - Optional download (2GB), fallback works without it
 
 ## GitHub Repository
 https://github.com/ilhamilha-creator/medai-health-platform
