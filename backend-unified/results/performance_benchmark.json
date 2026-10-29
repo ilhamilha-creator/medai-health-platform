@@ -1,0 +1,22 @@
+{
+  "symptom_agent": {
+    "avg_latency_ms": 0.000960826873779297,
+    "throughput_rps": 1040770.2233250621
+  },
+  "urgency_agent": {
+    "avg_latency_ms": 0.0007915496826171875,
+    "throughput_rps": 1263344.5783132531
+  },
+  "care_plan_agent": {
+    "avg_latency_ms": 0.004353523254394531,
+    "throughput_rps": 229699.01423877326
+  },
+  "temporal_reasoning": {
+    "avg_latency_ms": 0.00033855438232421875,
+    "throughput_rps": 2953735.2112676054
+  },
+  "langchain_agent": {
+    "avg_latency_ms": 0.0030660629272460938,
+    "throughput_rps": 326151.166407465
+  }
+}

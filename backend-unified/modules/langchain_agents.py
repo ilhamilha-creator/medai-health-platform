@@ -3,16 +3,6 @@ LangChain-based Care Plan Agent
 Uses LangChain for sophisticated care plan generation
 """
 
-try:
-    from langchain.agents import AgentExecutor, create_openai_functions_agent
-    from langchain.tools import Tool
-    from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-    from langchain.schema import SystemMessage
-    LANGCHAIN_AVAILABLE = True
-except ImportError:
-    LANGCHAIN_AVAILABLE = False
-    print("LangChain agents not available, using custom implementation")
-
 print("Initializing LangChain Care Plan Agent...")
 
 # Define tools for the agent
@@ -49,7 +39,14 @@ def get_monitoring_parameters(condition: str) -> str:
     }
     return parameters.get(condition.lower(), 'Regular monitoring recommended')
 
-# Create LangChain tools
+# Simple tool structure (LangChain style but custom)
+class Tool:
+    def __init__(self, name, func, description):
+        self.name = name
+        self.func = func
+        self.description = description
+
+# Create tools
 tools = [
     Tool(
         name="MedicationInfo",
