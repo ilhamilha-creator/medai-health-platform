@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Colors médicaux personnalisés */
+:root {
+  --medical-dark-blue: #03045E;
+  --medical-blue: #0077B6;
+  --medical-light-blue: #00B4D8;
+  --medical-green: #52B788;
+  --medical-white: #FFFFFF;
+  --medical-gray: #6C757D;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #03045E 0%, #0077B6 100%);
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.medical-gradient {
+  background: linear-gradient(135deg, #0077B6 0%, #00B4D8 50%, #52B788 100%);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #00B4D8 0%, #52B788 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cinematic-shadow {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+              0 0 60px rgba(0, 119, 182, 0.2);
+}
+
+.medical-button {
+  @apply px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105;
+  background: linear-gradient(135deg, #0077B6 0%, #00B4D8 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 119, 182, 0.3);
+}
+
+.medical-button:hover {
+  box-shadow: 0 6px 25px rgba(0, 119, 182, 0.5);
+}
+
+.medical-card {
+  @apply rounded-xl p-6 glass-effect cinematic-shadow;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-up {
+  animation: slideUp 0.8s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(82, 183, 136, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(82, 183, 136, 0.6); }
+}
+
+.loading-spinner {
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 3px solid #52B788;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
