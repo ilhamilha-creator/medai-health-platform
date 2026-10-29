@@ -76,7 +76,7 @@ This platform demonstrates a complete implementation of a medical AI system with
 ```bash
 # Clone the repository
 git clone https://github.com/ilhamilha-creator/medai-health-platform.git
-cd medical-ai-platform_finale
+cd medai-health-platform
 
 # Backend setup
 cd backend-unified
@@ -164,7 +164,7 @@ python quick_demo.py
 ## 📁 Project Structure
 
 ```
-medical-ai-platform_finale/
+medai-health-platform/
 ├── backend-unified/          # FastAPI backend
 │   ├── modules/              # Core modules
 │   │   ├── auth/            # Authentication
