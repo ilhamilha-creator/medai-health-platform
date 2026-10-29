@@ -165,7 +165,7 @@ python quick_demo.py
 
 ```
 medai-health-platform/
-├── backend-unified/          # FastAPI backend
+├── backend-unified/          # FastAPI backend (unified backend module)
 │   ├── modules/              # Core modules
 │   │   ├── auth/            # Authentication
 │   │   ├── ml_service/      # ML predictions
