@@ -16,6 +16,12 @@ python test_agents.py
 ```
 Tests: Symptom Agent, Urgency Agent, Coordination Agent, Temporal Reasoning
 
+#### Test AI Agents with EHPAD Data
+```bash
+python test_agents_ehpad.py
+```
+Tests: Care Plan Synthesis, Follow-up Agent, Temporal Reasoning with simulated EHPAD data
+
 #### Test Fallback LLM (Standalone)
 ```bash
 python fallback_llm.py
@@ -27,6 +33,18 @@ Tests: Simulated LLM responses for medical queries
 python quick_test.py
 ```
 Tests: Backend health endpoint
+
+#### Test ML Evaluation
+```bash
+python evaluate_ml.py
+```
+Tests: ML model evaluation with benchmarks
+
+#### Test Vision Service
+```bash
+python test_vision.py
+```
+Tests: Vision service with synthetic images
 
 ### 3. API Endpoints (Requires Auth)
 
@@ -77,16 +95,29 @@ curl -X POST http://localhost:8000/api/agents/urgency-assessment \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"symptoms":"severe pain in chest","vital_signs":{"heart_rate":120}}'
+
+# Care Plan Synthesis Agent
+curl -X POST http://localhost:8000/api/agents/care-plan-synthesis \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"patient_data":{"id":"patient_001","age":75,"gender":"female"},"clinical_findings":{"diagnosis":"Hypertension","conditions":["hypertension"]},"recommendations":["BP monitoring"]}'
+
+# Follow-up Scheduling Agent
+curl -X POST http://localhost:8000/api/agents/follow-up-schedule \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"patient_id":"patient_001","tasks":[{"type":"checkup","description":"Weekly visit","assigned_to":"nurse","frequency":"weekly"}],"time_horizon_days":30}'
 ```
 
 ## What Works for Demo
 
-✅ **ML Predictions** - 7 XGBoost models (diabetes, cardio, cancer, kidney, liver, thyroid, respiratory)
-✅ **AI Agents** - Symptom analysis, urgency assessment, care coordination
-✅ **Temporal Reasoning** - Track changes over time
-✅ **RAG** - Medical knowledge base retrieval
+✅ **ML Predictions** - 7 XGBoost models with evaluation and benchmarks
+✅ **AI Agents** - Symptom analysis, urgency assessment, care coordination, care plan synthesis, follow-up scheduling
+✅ **Temporal Reasoning** - Track changes over time with EHPAD longitudinal data (100 patients, 6 months)
+✅ **RAG** - Extended medical knowledge base (15 documents)
 ✅ **LLM** - DistilGPT2 (HuggingFace transformers, auto-downloads 500MB)
-⚠️ **Vision** - Code exists but not tested
+✅ **Evaluation** - ML model evaluation with accuracy, precision, recall, F1, AUC metrics
+⚠️ **Vision** - Code exists with synthetic test images (not real medical images)
 
 ## GitHub Repository
 https://github.com/ilhamilha-creator/medai-health-platform
