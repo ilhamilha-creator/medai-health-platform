@@ -18,43 +18,33 @@ llm_router = APIRouter()
 llm_model = None
 
 def get_llm_model():
-    """Lazy load LLM model with fallback"""
+    """Lazy load LLM model using HuggingFace transformers (DistilGPT2)"""
     global llm_model
     if llm_model is None:
         try:
-            from llama_cpp import Llama
+            from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
             
-            model_path = getattr(settings, 'LLM_MODEL_PATH', './models/phi-3-mini-4k-instruct-q4.gguf')
+            # Use DistilGPT2 - small, fast, auto-downloads
+            model_name = "distilgpt2"
             
-            if not os.path.exists(model_path):
-                print(f"LLM model not found at {model_path}. Using fallback.")
-                # Try to load fallback
-                try:
-                    from fallback_llm import FallbackLLM
-                    llm_model = FallbackLLM()
-                    print("Fallback LLM loaded")
-                    return llm_model
-                except:
-                    raise FileNotFoundError(f"LLM model not found and fallback unavailable")
+            print(f"Loading {model_name} from HuggingFace...")
+            tokenizer = AutoTokenizer.from_pretrained(model_name)
+            model = AutoModelForCausalLM.from_pretrained(model_name)
             
-            llm_model = Llama(
-                model_path=model_path,
-                n_ctx=2048,
-                n_gpu_layers=-1 if hasattr(settings, 'USE_GPU') and settings.USE_GPU else 0,
-                verbose=False
-            )
+            # Create pipeline
+            llm_model = pipeline("text-generation", model=model, tokenizer=tokenizer, max_length=200)
             
-            print(f"LLM loaded from {model_path}")
+            print(f"LLM loaded: {model_name}")
             
         except ImportError:
             # Try fallback
             try:
                 from fallback_llm import FallbackLLM
                 llm_model = FallbackLLM()
-                print("Fallback LLM loaded (llama-cpp-python not installed)")
+                print("Fallback LLM loaded (transformers not installed)")
                 return llm_model
             except:
-                raise RuntimeError("llama-cpp-python not installed and fallback unavailable")
+                raise RuntimeError("transformers not installed and fallback unavailable")
         except Exception as e:
             # Try fallback
             try:
@@ -90,7 +80,7 @@ class HealthResponse(BaseModel):
 
 @llm_router.post("/chat", response_model=ChatResponse)
 async def chat_with_llm(request: ChatRequest, current_user: dict = Depends(get_current_user)):
-    """Chat with local LLM for African healthcare context (with fallback)"""
+    """Chat with local LLM using HuggingFace transformers (with fallback)"""
     if not settings.LLM_ENABLED:
         raise HTTPException(status_code=503, detail="LLM service is disabled. Enable LLM_ENABLED=True in .env")
     
@@ -108,23 +98,13 @@ async def chat_with_llm(request: ChatRequest, current_user: dict = Depends(get_c
             elapsed = time.time() - start_time
             tokens_per_second = len(response_text.split()) / elapsed if elapsed > 0 else 0
         else:
-            # Use real LLM
-            prompt = "You are a helpful medical assistant for African healthcare context. "
-            
-            if request.conversation_history:
-                for msg in request.conversation_history:
-                    if msg.get('role') == 'user':
-                        prompt += f"User: {msg.get('content', '')} "
-                    elif msg.get('role') == 'assistant':
-                        prompt += f"Assistant: {msg.get('content', '')} "
-            
-            prompt += f"User: {request.message} Assistant:"
+            # Use transformers pipeline
+            prompt = f"Medical assistant: {request.message}"
             
             start_time = time.time()
-            max_tokens = request.max_tokens or 512
             
-            output = model(prompt, max_tokens=max_tokens)
-            response_text = output['choices'][0]['text'].strip()
+            outputs = model(prompt, max_length=200, num_return_sequences=1)
+            response_text = outputs[0]['generated_text'].replace(prompt, "").strip()
             
             elapsed = time.time() - start_time
             tokens_per_second = len(response_text.split()) / elapsed if elapsed > 0 else 0
@@ -171,9 +151,9 @@ async def analyze_symptoms_llm(symptoms: str, current_user: dict = Depends(get_c
         if is_fallback:
             analysis = model.generate(f"Analyze these symptoms: {symptoms}", max_tokens=256)
         else:
-            prompt = f"Analyze these symptoms in African healthcare context: {symptoms}. Provide possible conditions and recommendations."
-            output = model(prompt, max_tokens=256)
-            analysis = output['choices'][0]['text'].strip()
+            prompt = f"Analyze these symptoms: {symptoms}. Possible conditions:"
+            outputs = model(prompt, max_length=256)
+            analysis = outputs[0]['generated_text'].replace(prompt, "").strip()
         
         return {
             "analysis": analysis,
