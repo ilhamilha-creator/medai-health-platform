@@ -113,6 +113,9 @@ curl -X POST http://localhost:8000/api/agents/follow-up-schedule \
 
 ✅ **ML Predictions** - 7 XGBoost models with evaluation and benchmarks
 ✅ **AI Agents** - Symptom analysis, urgency assessment, care coordination, care plan synthesis, follow-up scheduling
+✅ **LangChain Agents** - Care plan agent using LangChain tools (preferred framework)
+✅ **Advanced Temporal Reasoning** - CUSUM, EWMA, Z-score change detection
+✅ **Document Integration** - PDF processing and information extraction
 ✅ **Temporal Reasoning** - Track changes over time with EHPAD longitudinal data (100 patients, 6 months)
 ✅ **RAG** - Extended medical knowledge base (15 documents)
 ✅ **LLM** - DistilGPT2 (HuggingFace transformers, auto-downloads 500MB)
